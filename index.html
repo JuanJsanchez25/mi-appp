@@ -5,11 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Calculadora de Dilución</title>
 
-  <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#ff0000" />
 
-  <!-- Estilos -->
   <style>
     body {
       background-color: #000;
@@ -77,7 +75,6 @@
       font-size: 14px;
     }
 
-    /* Botones extra para borrar/exportar */
     .btn-historial {
       width: 45%;
       max-width: 150px;
@@ -94,6 +91,30 @@
     .btn-historial:hover {
       background-color: #666;
     }
+
+    /* Flex para sucursal y fecha */
+    .sucursal-fecha {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      align-items: center;
+      max-width: 320px;
+      margin: 0 auto 10px auto;
+    }
+
+    .sucursal-fecha input#sucursal {
+      flex: 1;
+    }
+
+    .sucursal-fecha input#fecha {
+      width: 150px;
+      background-color: #222;
+      color: #fff;
+      border: none;
+      padding: 10px;
+      font-size: 14px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -103,11 +124,16 @@
   <input type="number" id="cantidadProducto" placeholder="Producto puro (ml)" /><br />
   <input type="number" id="litrosAgua" placeholder="Cantidad de agua (litros)" /><br />
 
-  <input type="text" id="sucursal" placeholder="Sucursal" /><br />
+  <div class="sucursal-fecha">
+    <input type="text" id="sucursal" placeholder="Sucursal" />
+    <input type="text" id="fecha" readonly />
+  </div>
+
   <input type="text" id="producto" placeholder="Producto" /><br />
 
-  <button onclick="calcularDilucion()">Calcular</button>
+  <!-- Botones con cambio de lugar -->
   <button class="btn-limpiar" onclick="limpiarCampos()">Limpiar campos</button>
+  <button onclick="calcularDilucion()">Calcular</button>
   <button onclick="irADilutores()">Ir a Total Mix - ¿Cómo funciona?</button>
 
   <div class="resultado" id="resultado"></div>
@@ -148,13 +174,13 @@
       const sucursal = document.getElementById('sucursal').value.trim();
       const productoNombre = document.getElementById('producto').value.trim();
       const resultadoTexto = document.getElementById('resultado').innerText;
+      const fecha = document.getElementById('fecha').value;
 
-      if (!sucursal || !productoNombre || resultadoTexto === "") {
+      if (!sucursal || !productoNombre || resultadoTexto === "" || !fecha) {
         alert("Por favor, completá los datos y calculá antes de guardar.");
         return;
       }
 
-      const fecha = new Date().toLocaleString();
       const registro = `${fecha} - ${sucursal} - ${productoNombre} → ${resultadoTexto}`;
 
       let registros = JSON.parse(localStorage.getItem("historialDiluciones")) || [];
@@ -224,15 +250,16 @@
       window.open("https://www.spartanchemical.com/es/products/dispensing/total-mix/", "_blank");
     }
 
-    // Cargar historial al iniciar
-    mostrarHistorial();
-
-    // Service Worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js')
-        .then(() => console.log('Service Worker registrado'))
-        .catch(err => console.error('Error al registrar Service Worker:', err));
+    function mostrarFechaActual() {
+      const fechaInput = document.getElementById('fecha');
+      const hoy = new Date();
+      const fechaFormateada = hoy.toLocaleDateString('es-AR') + ' ' + hoy.toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'});
+      fechaInput.value = fechaFormateada;
     }
+
+    // Mostrar historial y fecha al cargar
+    mostrarHistorial();
+    mostrarFechaActual();
   </script>
 </body>
 </html>
