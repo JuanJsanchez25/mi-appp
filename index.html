@@ -61,29 +61,29 @@
 
   <div class="resultado" id="resultado"></div>
 
-  <script>
-    function calcularDilucion() {
-      const producto = parseFloat(document.getElementById('cantidadProducto').value);
-      const agua = parseFloat(document.getElementById('litrosAgua').value);
+<script>
+  function calcularDilucion() {
+    const producto = parseFloat(document.getElementById('cantidadProducto').value);
+    const agua = parseFloat(document.getElementById('litrosAgua').value);
 
-      if (isNaN(producto) || isNaN(agua) || agua === 0) {
-        document.getElementById('resultado').innerText = "Por favor, ingresá valores válidos.";
-        return;
-      }
-
-      const total = producto + (agua * 1000); // agua en ml
-      const porcentaje = (producto / total) * 100;
-
-      document.getElementById('resultado').innerText = 
-        `La dilución es de aproximadamente ${porcentaje.toFixed(2)}%`;
+    if (isNaN(producto) || isNaN(agua) || agua === 0) {
+      document.getElementById('resultado').innerText = "Por favor, ingresá valores válidos.";
+      return;
     }
 
-    // Service Worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js')
-        .then(() => console.log('Service Worker registrado'))
-        .catch(err => console.error('Error al registrar Service Worker:', err));
-    }
-  </script>
+    const porcentaje = (producto / (agua * 1000)) * 100;
+
+    document.getElementById('resultado').innerText = 
+      `La dilución es de ${porcentaje.toFixed(2)}%`;
+  }
+
+  // Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js')
+      .then(() => console.log('Service Worker registrado'))
+      .catch(err => console.error('Error al registrar Service Worker:', err));
+  }
+</script>
+
 </body>
 </html>
