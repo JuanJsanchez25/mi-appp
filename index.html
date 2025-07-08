@@ -1,3 +1,25 @@
-git add .
-git commit -m "Agrego manifest y PWA listo para instalar en celular"
-git push
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calculadora de Dilución</title>
+
+  <!-- Manifest para PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#ff0000" />
+</head>
+<body>
+  <h1>Calculadora de Dilución</h1>
+
+  <!-- Aquí puede ir el contenido de tu app -->
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(() => console.log('Service Worker registrado'))
+        .catch(err => console.error('Error al registrar Service Worker:', err));
+    }
+  </script>
+</body>
+</html>
