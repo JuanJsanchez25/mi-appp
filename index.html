@@ -58,6 +58,24 @@
     .btn-limpiar:hover {
       background-color: #777;
     }
+
+    #historial {
+      margin-top: 20px;
+      text-align: left;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+      list-style: none;
+      padding-left: 0;
+    }
+
+    #historial li {
+      background-color: #222;
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      border-radius: 5px;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
@@ -67,10 +85,17 @@
   <input type="number" id="cantidadProducto" placeholder="Producto puro (ml)" /><br />
   <input type="number" id="litrosAgua" placeholder="Cantidad de agua (litros)" /><br />
 
+  <input type="text" id="sucursal" placeholder="Sucursal" /><br />
+  <input type="text" id="producto" placeholder="Producto" /><br />
+
   <button onclick="calcularDilucion()">Calcular</button>
   <button class="btn-limpiar" onclick="limpiarCampos()">Limpiar campos</button>
+  <button onclick="irADilutores()">Ir a Total Mix - ¿Cómo funciona?</button>
 
   <div class="resultado" id="resultado"></div>
+
+  <h2>Historial de controles</h2>
+  <ul id="historial"></ul>
 
   <script>
     function calcularDilucion() {
@@ -91,8 +116,50 @@
     function limpiarCampos() {
       document.getElementById('cantidadProducto').value = "";
       document.getElementById('litrosAgua').value = "";
+      document.getElementById('sucursal').value = "";
+      document.getElementById('producto').value = "";
       document.getElementById('resultado').innerText = "";
     }
+
+    function guardarRegistro() {
+      const sucursal = document.getElementById('sucursal').value.trim();
+      const productoNombre = document.getElementById('producto').value.trim();
+      const resultadoTexto = document.getElementById('resultado').innerText;
+
+      if (!sucursal || !productoNombre || resultadoTexto === "") {
+        alert("Por favor, completá los datos y calculá antes de guardar.");
+        return;
+      }
+
+      const fecha = new Date().toLocaleString();
+      const registro = `${fecha} - ${sucursal} - ${productoNombre} → ${resultadoTexto}`;
+
+      let registros = JSON.parse(localStorage.getItem("historialDiluciones")) || [];
+      registros.push(registro);
+      localStorage.setItem("historialDiluciones", JSON.stringify(registros));
+
+      mostrarHistorial();
+      limpiarCampos();
+    }
+
+    function mostrarHistorial() {
+      const lista = document.getElementById('historial');
+      lista.innerHTML = "";
+
+      const registros = JSON.parse(localStorage.getItem("historialDiluciones")) || [];
+      registros.forEach(reg => {
+        const li = document.createElement("li");
+        li.textContent = reg;
+        lista.appendChild(li);
+      });
+    }
+
+    function irADilutores() {
+      window.open("https://es.scribd.com/document/735125442/FICHA-TECNICA-TOTAL-MIX", "_blank");
+    }
+
+    // Cargar historial al iniciar
+    mostrarHistorial();
 
     // Service Worker
     if ('serviceWorker' in navigator) {
