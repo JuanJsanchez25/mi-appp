@@ -35,15 +35,28 @@
       font-size: 20px;
     }
 
-    input, select, button {
+    input, button {
       padding: 10px;
       margin: 10px;
       font-size: 16px;
+      width: 80%;
+      max-width: 300px;
     }
 
     .resultado {
       margin-top: 20px;
       font-size: 18px;
+    }
+
+    .btn-limpiar {
+      background-color: #555;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-limpiar:hover {
+      background-color: #777;
     }
   </style>
 </head>
@@ -51,39 +64,42 @@
   <div class="banner">YOMA</div>
   <h1>Calculadora de % de Dilución</h1>
 
-  <label for="cantidadProducto">Cantidad de producto puro (ml):</label><br />
-  <input type="number" id="cantidadProducto" /><br />
-
-  <label for="litrosAgua">Cantidad de agua (litros):</label><br />
-  <input type="number" id="litrosAgua" /><br />
+  <input type="number" id="cantidadProducto" placeholder="Producto puro (ml)" /><br />
+  <input type="number" id="litrosAgua" placeholder="Cantidad de agua (litros)" /><br />
 
   <button onclick="calcularDilucion()">Calcular</button>
+  <button class="btn-limpiar" onclick="limpiarCampos()">Limpiar campos</button>
 
   <div class="resultado" id="resultado"></div>
 
-<script>
-  function calcularDilucion() {
-    const producto = parseFloat(document.getElementById('cantidadProducto').value);
-    const agua = parseFloat(document.getElementById('litrosAgua').value);
+  <script>
+    function calcularDilucion() {
+      const producto = parseFloat(document.getElementById('cantidadProducto').value);
+      const agua = parseFloat(document.getElementById('litrosAgua').value);
 
-    if (isNaN(producto) || isNaN(agua) || agua === 0) {
-      document.getElementById('resultado').innerText = "Por favor, ingresá valores válidos.";
-      return;
+      if (isNaN(producto) || isNaN(agua) || agua === 0) {
+        document.getElementById('resultado').innerText = "Por favor, ingresá valores válidos.";
+        return;
+      }
+
+      const porcentaje = (producto / (agua * 1000)) * 100;
+
+      document.getElementById('resultado').innerText = 
+        `La dilución es de ${porcentaje.toFixed(2)}%`;
     }
 
-    const porcentaje = (producto / (agua * 1000)) * 100;
+    function limpiarCampos() {
+      document.getElementById('cantidadProducto').value = "";
+      document.getElementById('litrosAgua').value = "";
+      document.getElementById('resultado').innerText = "";
+    }
 
-    document.getElementById('resultado').innerText = 
-      `La dilución es de ${porcentaje.toFixed(2)}%`;
-  }
-
-  // Service Worker
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js')
-      .then(() => console.log('Service Worker registrado'))
-      .catch(err => console.error('Error al registrar Service Worker:', err));
-  }
-</script>
-
+    // Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(() => console.log('Service Worker registrado'))
+        .catch(err => console.error('Error al registrar Service Worker:', err));
+    }
+  </script>
 </body>
 </html>
