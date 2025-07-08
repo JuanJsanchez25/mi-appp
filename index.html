@@ -92,7 +92,6 @@
       background-color: #666;
     }
 
-    /* Flex para sucursal y fecha */
     .sucursal-fecha {
       display: flex;
       justify-content: center;
@@ -131,7 +130,6 @@
 
   <input type="text" id="producto" placeholder="Producto" /><br />
 
-  <!-- Botones con cambio de lugar -->
   <button class="btn-limpiar" onclick="limpiarCampos()">Limpiar campos</button>
   <button onclick="calcularDilucion()">Calcular</button>
   <button onclick="irADilutores()">Ir a Total Mix - ¿Cómo funciona?</button>
@@ -143,7 +141,7 @@
 
   <div>
     <button class="btn-historial" onclick="borrarHistorial()">Borrar historial</button>
-    <button class="btn-historial" onclick="exportarHistorial()">Exportar historial (CSV)</button>
+    <button class="btn-historial" onclick="enviarHistorialWhatsApp()">Enviar historial a WhatsApp</button>
   </div>
 
   <script>
@@ -158,8 +156,11 @@
 
       const porcentaje = (producto / (agua * 1000)) * 100;
 
-      document.getElementById('resultado').innerText = 
+      document.getElementById('resultado').innerText =
         `La dilución es de ${porcentaje.toFixed(2)}%`;
+
+      // Guardar registro automático cuando se calcula con todos los datos
+      guardarRegistro();
     }
 
     function limpiarCampos() {
@@ -177,8 +178,7 @@
       const fecha = document.getElementById('fecha').value;
 
       if (!sucursal || !productoNombre || resultadoTexto === "" || !fecha) {
-        alert("Por favor, completá los datos y calculá antes de guardar.");
-        return;
+        return; // No guarda si falta info
       }
 
       const registro = `${fecha} - ${sucursal} - ${productoNombre} → ${resultadoTexto}`;
@@ -210,40 +210,22 @@
       }
     }
 
-    function exportarHistorial() {
+    function enviarHistorialWhatsApp() {
       const registros = JSON.parse(localStorage.getItem("historialDiluciones")) || [];
       if (registros.length === 0) {
-        alert("No hay registros para exportar.");
+        alert("No hay registros para enviar.");
         return;
       }
 
-      let csvContent = "data:text/csv;charset=utf-8,";
-      csvContent += "Fecha,Sucursal,Producto,Resultado\n";
-
-      registros.forEach(reg => {
-        const parts1 = reg.split(" - ");
-        if(parts1.length < 3) return;
-
-        const fecha = parts1[0];
-        const sucursal = parts1[1];
-
-        const parts2 = parts1[2].split(" → ");
-        if(parts2.length < 2) return;
-
-        const producto = parts2[0];
-        const resultado = parts2[1];
-
-        const row = [fecha, sucursal, producto, resultado].map(item => `"${item}"`).join(",");
-        csvContent += row + "\n";
+      let texto = "Historial de diluciones:\n\n";
+      registros.forEach((reg, i) => {
+        texto += `${i + 1}. ${reg}\n`;
       });
 
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "historial_diluciones.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const textoCodificado = encodeURIComponent(texto);
+      const numero = "543584351051"; // Tu número con código de país (54 Argentina + 3584351051)
+      const urlWhatsApp = `https://wa.me/${numero}?text=${textoCodificado}`;
+      window.open(urlWhatsApp, "_blank");
     }
 
     function irADilutores() {
@@ -263,3 +245,4 @@
   </script>
 </body>
 </html>
+
