@@ -76,6 +76,24 @@
       border-radius: 5px;
       font-size: 14px;
     }
+
+    /* Botones extra para borrar/exportar */
+    .btn-historial {
+      width: 45%;
+      max-width: 150px;
+      margin: 5px 5px;
+      background-color: #444;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 10px;
+      border-radius: 5px;
+      display: inline-block;
+    }
+    .btn-historial:hover {
+      background-color: #666;
+    }
   </style>
 </head>
 <body>
@@ -96,6 +114,11 @@
 
   <h2>Historial de controles</h2>
   <ul id="historial"></ul>
+
+  <div>
+    <button class="btn-historial" onclick="borrarHistorial()">Borrar historial</button>
+    <button class="btn-historial" onclick="exportarHistorial()">Exportar historial (CSV)</button>
+  </div>
 
   <script>
     function calcularDilucion() {
@@ -154,8 +177,51 @@
       });
     }
 
+    function borrarHistorial() {
+      if (confirm("¿Querés borrar todo el historial?")) {
+        localStorage.removeItem("historialDiluciones");
+        mostrarHistorial();
+      }
+    }
+
+    function exportarHistorial() {
+      const registros = JSON.parse(localStorage.getItem("historialDiluciones")) || [];
+      if (registros.length === 0) {
+        alert("No hay registros para exportar.");
+        return;
+      }
+
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Fecha,Sucursal,Producto,Resultado\n";
+
+      registros.forEach(reg => {
+        const parts1 = reg.split(" - ");
+        if(parts1.length < 3) return;
+
+        const fecha = parts1[0];
+        const sucursal = parts1[1];
+
+        const parts2 = parts1[2].split(" → ");
+        if(parts2.length < 2) return;
+
+        const producto = parts2[0];
+        const resultado = parts2[1];
+
+        const row = [fecha, sucursal, producto, resultado].map(item => `"${item}"`).join(",");
+        csvContent += row + "\n";
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "historial_diluciones.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
     function irADilutores() {
-      window.open("https://es.scribd.com/document/735125442/FICHA-TECNICA-TOTAL-MIX", "_blank");
+      window.open("https://www.spartanchemical.com/es/products/dispensing/total-mix/", "_blank");
     }
 
     // Cargar historial al iniciar
