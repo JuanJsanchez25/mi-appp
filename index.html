@@ -5,16 +5,80 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Calculadora de Dilución</title>
 
-  <!-- Manifest para PWA -->
+  <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#ff0000" />
+
+  <!-- Estilos -->
+  <style>
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .banner {
+      background-color: red;
+      color: white;
+      font-weight: bold;
+      font-size: 28px;
+      border: 2px solid black;
+      padding: 10px;
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 20px;
+    }
+
+    input, select, button {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+    }
+
+    .resultado {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Calculadora de Dilución</h1>
+  <div class="banner">YOMA</div>
+  <h1>Calculadora de % de Dilución</h1>
 
-  <!-- Aquí puede ir el contenido de tu app -->
+  <label for="cantidadProducto">Cantidad de producto puro (ml):</label><br />
+  <input type="number" id="cantidadProducto" /><br />
+
+  <label for="litrosAgua">Cantidad de agua (litros):</label><br />
+  <input type="number" id="litrosAgua" /><br />
+
+  <button onclick="calcularDilucion()">Calcular</button>
+
+  <div class="resultado" id="resultado"></div>
 
   <script>
+    function calcularDilucion() {
+      const producto = parseFloat(document.getElementById('cantidadProducto').value);
+      const agua = parseFloat(document.getElementById('litrosAgua').value);
+
+      if (isNaN(producto) || isNaN(agua) || agua === 0) {
+        document.getElementById('resultado').innerText = "Por favor, ingresá valores válidos.";
+        return;
+      }
+
+      const total = producto + (agua * 1000); // agua en ml
+      const porcentaje = (producto / total) * 100;
+
+      document.getElementById('resultado').innerText = 
+        `La dilución es de aproximadamente ${porcentaje.toFixed(2)}%`;
+    }
+
+    // Service Worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js')
         .then(() => console.log('Service Worker registrado'))
